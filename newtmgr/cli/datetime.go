@@ -21,6 +21,7 @@ package cli
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -48,8 +49,16 @@ func dateTimeRead(s sesn.Sesn) error {
 func dateTimeWrite(s sesn.Sesn, args []string) error {
 	c := xact.NewDateTimeWriteCmd()
 	c.SetTxOptions(nmutil.TxOptions())
-	c.DateTime = args[0]
 
+	if args[0] != "now" {
+		c.DateTime = args[0]
+	} else {
+		dt, err := time.Now().MarshalText()
+		if err != nil {
+			return err
+		}
+		c.DateTime = string(dt)
+	}
 	res, err := c.Run(s)
 	if err != nil {
 		return util.ChildNewtError(err)
